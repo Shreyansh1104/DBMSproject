@@ -1,4 +1,4 @@
-# PantryBoard — Food Expiry & Nutrition Tracking System
+# Food Expiry & Nutrition Tracking System
 
 A full-stack web application for tracking food expiry dates and monitoring daily nutrition intake. Built with **MySQL**, **Node.js + Express**, and a vanilla **HTML/CSS/JavaScript** frontend.
 
