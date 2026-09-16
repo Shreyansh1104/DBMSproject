@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restaurant Inventory</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div id="auth-container">
+  <div id="login-box" class="auth-box">
+    <h1>Restaurant Inventory</h1>
+    <div class="input-group"><label>Email Address</label>
+      <input type="email" id="login-email" placeholder="Enter email"></div>
+    <div class="input-group"><label>Password</label>
+      <input type="password" id="login-password" placeholder="Enter password"></div>
+    <button class="auth-btn" onclick="handleLogin()">Sign In</button>
+    <p id="login-error" class="auth-error"></p>
+    <div class="auth-switch">Don't have an account? <a onclick="showSignup()">Sign up</a></div>
+  </div>
+
+  <div id="signup-box" class="auth-box" style="display:none;">
+    <h1>Restaurant Inventory</h1>
+    <p class="auth-sub">Register a new account</p>
+    <div class="input-group"><label>Full Name</label>
+      <input type="text" id="signup-name" placeholder="Enter name"></div>
+    <div class="input-group"><label>Email Address (must be @gmail.com)</label>
+      <input type="email" id="signup-email" placeholder="Enter email"></div>
+    <div class="input-group"><label>Password</label>
+      <input type="password" id="signup-password" placeholder="Create a password"></div>
+    <div class="input-group"><label>Confirm Password</label>
+      <input type="password" id="signup-confirm" placeholder="Re-enter password"></div>
+    <button class="auth-btn" onclick="handleSignup()">Create Account</button>
+    <p id="signup-error" class="auth-error"></p>
+    <p id="signup-success" class="auth-success">Account created! Redirecting to login…</p>
+    <div class="auth-switch">Already have an account? <a onclick="showLogin()">Sign in</a></div>
+  </div>
+</div>
+
+<div id="dashboard-screen">
+  <div class="app">
+    <div class="sidebar">
+      <div class="sidebar-header"><h2>Restaurant Inventory</h2></div>
+      <div class="nav-link active" data-tab="dashboard" onclick="switchTab('dashboard', this)">Dashboard</div>
+      <div class="nav-link" data-tab="catalog" onclick="switchTab('catalog', this)">Categories & Items</div>
+      <div class="nav-link" data-tab="inventory" onclick="switchTab('inventory', this)">Inventory</div>
+      <div class="nav-link" data-tab="menu" onclick="switchTab('menu', this)">Menu & Recipes</div>
+      <div class="nav-link" data-tab="orders" onclick="switchTab('orders', this)">Customer Orders</div>
+      <div class="nav-link" data-tab="staff" onclick="switchTab('staff', this)">Staff</div>
+      <div class="logout-container"><button class="logout-btn" onclick="handleLogout()">Logout</button></div>
+    </div>
+
+    <div class="main-content">
+
+      <div id="tab-dashboard" class="tab-content active">
+        <div class="header-bar"><div><h2>Dashboard Overview</h2>
+          <div class="subtitle">Snapshot of all entities in the database</div></div></div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="number" id="stat-categories">0</div><div class="label">Categories</div></div>
+          <div class="stat-card"><div class="number" id="stat-food-items">0</div><div class="label">Food Items</div></div>
+          <div class="stat-card"><div class="number" id="stat-batches">0</div><div class="label">Food Batches</div></div>
+          <div class="stat-card"><div class="number" id="stat-menu">0</div><div class="label">Menu Items</div></div>
+          <div class="stat-card"><div class="number" id="stat-recipes">0</div><div class="label">Recipe Lines</div></div>
+          <div class="stat-card"><div class="number" id="stat-staff">0</div><div class="label">Staff</div></div>
+          <div class="stat-card"><div class="number" id="stat-orders">0</div><div class="label">Orders</div></div>
+        </div>
+        <div class="card">
+          <h3>Stock/Expiry Alerts</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Batch ID</th><th>Food Item</th><th>Quantity Remaining</th><th>Expiration</th><th>Status</th></tr></thead>
+            <tbody id="dashboard-alerts-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <div id="tab-catalog" class="tab-content">
+        <div class="header-bar"><div><h2>Catalog</h2>
+          <div class="subtitle">Categories, Food Items, and Nutrition Profiles</div></div></div>
+
+        <div class="card">
+          <h3>Add New Category</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Category Name</label>
+              <input type="text" id="cat-name" placeholder="Enter Category Type"></div>
+            <div class="form-group"><label>Description</label>
+              <input type="text" id="cat-desc" placeholder="Enter Category Description"></div>
+            <div class="form-group" style="flex:0.3;">
+              <button type="button" class="btn btn-primary" style="width:100%;" onclick="saveCategory()">Save Category</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Categories</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Name</th><th>Description</th></tr></thead>
+            <tbody id="category-table-body"></tbody></table></div>
+        </div>
+
+        <div class="card">
+          <h3>Add New Food Item</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Name</label>
+              <input type="text" id="fi-name" placeholder="Enter Food Item"></div>
+            <div class="form-group"><label>Category</label>
+              <select id="fi-category"></select></div>
+            <div class="form-group"><label>Unit</label>
+              <input type="text" id="fi-unit" placeholder="Enter Unit"></div>
+            <div class="form-group"><label>Perishable?</label>
+              <select id="fi-perishable"><option value="true">Yes</option><option value="false">No</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Calories (cal)</label><input type="number" id="fi-cal" value="0"></div>
+            <div class="form-group"><label>Protein (g)</label><input type="number" id="fi-pro" value="0"></div>
+            <div class="form-group"><label>Carbs (g)</label><input type="number" id="fi-carb" value="0"></div>
+            <div class="form-group"><label>Fat (g)</label><input type="number" id="fi-fat" value="0"></div>
+            <div class="form-group"><label>Sodium (mg)</label><input type="number" id="fi-sodium" value="0"></div>
+            <div class="form-group" style="flex:0.3;">
+              <button type="button" class="btn btn-primary" style="width:100%;" onclick="saveFoodItem()">Save Food Item</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Food Items & Nutrition</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Unit</th><th>Perishable</th>
+              <th>Cal</th><th>Pro (g)</th><th>Carb (g)</th><th>Fat (g)</th><th>Sodium (mg)</th></tr></thead>
+            <tbody id="food-item-table-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <div id="tab-inventory" class="tab-content">
+        <div class="header-bar"><div><h2>Inventory</h2>
+          <div class="subtitle">Track stock quantities and expiration dates</div></div></div>
+        <div class="card">
+          <h3>Add New Stock</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Food Item</label><select id="inv-item-id"></select></div>
+            <div class="form-group"><label>Quantity Received</label><input type="number" id="inv-qty"></div>
+            <div class="form-group"><label>Expiration Date</label><input type="date" id="inv-exp"></div>
+            <div class="form-group" style="flex:0.3;">
+              <button type="button" class="btn btn-primary" style="width:100%;" onclick="addBatch()">Add Batch</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Current Stock</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Batch ID</th><th>Food Item</th><th>Quantity Received</th><th>Quantity Remaining</th>
+              <th>Received Date</th><th>Expiration Date</th><th>Status</th></tr></thead>
+            <tbody id="inventory-table-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <div id="tab-menu" class="tab-content">
+        <div class="header-bar"><div><h2>Menu & Recipes</h2>
+          <div class="subtitle">Dishes and ingredient breakdown</div></div></div>
+
+        <div class="card">
+          <h3>Add New Menu Item</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Item Name</label>
+              <input type="text" id="menu-name" placeholder="Enter Item Name"></div>
+            <div class="form-group"><label>Selling Price ($)</label>
+              <input type="number" step="0.01" id="menu-price"></div>
+            <div class="form-group"><label>Availablity</label>
+              <select id="menu-available"><option value="true">Yes</option><option value="false">No</option></select></div>
+            <div class="form-group" style="flex:0.3;">
+              <button type="button" class="btn btn-primary" style="width:100%;" onclick="saveMenuItem()">Save Menu Item</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Menu Items</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Name</th><th>Selling Price</th><th>Availablity</th></tr></thead>
+            <tbody id="menu-item-table-body"></tbody></table></div>
+        </div>
+
+        <div class="card">
+          <h3>Add New Recipe</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Menu Item</label><select id="rec-menu-id"></select></div>
+          </div>
+          <div id="ingredients-container"></div>
+          <div class="form-row" style="margin-top:10px;">
+            <div class="form-group" style="flex:0.3;">
+              <button type="button" class="btn btn-ghost" style="width:100%;" onclick="addIngredientRow()">+ Add Ingredient</button></div>
+            <div class="form-group" style="flex:0.3;">
+              <button type="button" class="btn btn-primary" style="width:100%;" onclick="saveRecipe()">Save Recipe</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Recipe Breakdown</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Menu Item</th><th>Ingredient</th><th>Quantity Required</th><th>Unit</th></tr></thead>
+            <tbody id="recipe-table-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <div id="tab-orders" class="tab-content">
+        <div class="header-bar"><div><h2>Customer Orders</h2>
+          <div class="subtitle">Sales transactions and inventory deduction</div></div></div>
+        <div class="card">
+          <h3>Create New Order</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Menu Item</label><select id="order-item-id"></select></div>
+            <div class="form-group"><label>Quantity</label><input type="number" id="order-qty" value="1" min="1"></div>
+            <div class="form-group"><label>Staff Member</label><select id="order-staff-id"></select></div>
+            <div class="form-group" style="flex:0.3;">
+              <button type="button" class="btn btn-primary" style="width:100%;" onclick="placeOrder()">Place Order</button></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Order List</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>Menu Item</th><th>Quantity</th><th>Total</th><th>Staff</th><th>Timestamp</th><th>Status</th><th>Status</th></tr></thead>
+            <tbody id="orders-table-body"></tbody></table></div>
+        </div>
+      </div>
+
+      <div id="tab-staff" class="tab-content">
+        <div class="header-bar"><div><h2>Staff</h2>
+          <div class="subtitle">Employees records</div></div></div>
+
+        <div class="card">
+          <h3>Add New Staff Member</h3>
+          <div class="form-row">
+            <div class="form-group"><label>First Name</label><input type="text" id="st-fname"></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="st-lname"></div>
+            <div class="form-group"><label>Role</label>
+              <select id="st-role"><option>Waiter</option><option>Chef</option><option>Cashier</option><option>Manager</option></select></div>
+            <div class="form-group" style="flex:0.3;">
+              <button type="button" class="btn btn-primary" style="width:100%;" onclick="saveStaff()">Save Staff</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Staff Directory</h3>
+          <div class="table-wrap"><table>
+            <thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Role</th></tr></thead>
+            <tbody id="staff-table-body"></tbody></table></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/render.js"></script>
+<script src="js/handlers.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
